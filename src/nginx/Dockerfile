@@ -9,8 +9,8 @@ RUN apt-get update -y && apt upgrade -y
 RUN    apt-get install nginx -y
 RUN    apt-get install openssl -y
 RUN    openssl req -x509 -nodes -days 365	\
-    -newkey rsa:2048 -keyout /etc/ssl/private/asalek -prv.key \ 
-    -out /etc/ssl/certs/asalek-cer.crt-subj "/CN=zlaarous.42.fr"
+    -newkey rsa:2048 -keyout /etc/ssl/private/zlaarous.key -prv.key \ 
+    -out /etc/ssl/certs/zlaarous-cer.crt "/CN=zlaarous.42.fr"
 
 COPY ./config/file.conf /etc/nginx/sites-available/default
 # COPY ./src/nginx.conf /etc/nginx/sites-available/default
