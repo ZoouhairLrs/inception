@@ -1,15 +1,19 @@
 #base image : alpine is used for its small size and fast performance
-FROM debian:9
+FROM debian:bullseye
+# FROM debian:9
 
 #alpine package manager
-RUN apt-get update -y && apt upgrade -y && \
-    apt-get install nginx -y && \
-    apt-get install openssl -y && \
-    openssl req -x509 -nodes -days 365	\
+RUN apt-get update -y && apt upgrade -y
+
+
+RUN    apt-get install nginx -y
+RUN    apt-get install openssl -y
+RUN    openssl req -x509 -nodes -days 365	\
     -newkey rsa:2048 -keyout /etc/ssl/private/asalek -prv.key \ 
     -out /etc/ssl/certs/asalek-cer.crt-subj "/CN=zlaarous.42.fr"
 
-COPY ./srcs/nginx.conf /etc/nginx/sites-available/default
+COPY ./config/file.conf /etc/nginx/sites-available/default
+# COPY ./src/nginx.conf /etc/nginx/sites-available/default
 
 # openssl	: creating and managing OpenSSL certificates, keys, and other files.
 # req		: request a certificate 
