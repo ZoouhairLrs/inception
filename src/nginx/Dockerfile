@@ -1,35 +1,41 @@
-#base image : alpine is used for its small size and fast performance
-FROM debian:bullseye
-# FROM debian:9
+# Stage 1: Certifier
+FROM debian:bullseye-slim as certifier
+LABEL authors="zlaarous"
 
-#alpine package manager
-RUN apt-get update -y && apt upgrade -y
+WORKDIR /etc/ssl/nginx
 
+# Install OpenSSL and create a self-signed certificate
+RUN set -x && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends --no-install-suggests openssl=1.1.1w-0+deb11u1 && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout inception.key \
+        -out inception.crt \
+        -subj "/CN=inception"
 
-RUN    apt-get install nginx -y
-RUN    apt-get install openssl -y
-RUN    openssl req -x509 -nodes -days 365	\
-    -newkey rsa:2048 -keyout /etc/ssl/private/zlaarous.key -prv.key \ 
-    -out /etc/ssl/certs/zlaarous-cer.crt "/CN=zlaarous.42.fr"
+# Stage 2: Main image
+FROM debian:bullseye-slim
 
+# Install necessary packages with specific versions
+RUN set -x && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates=20210119 \
+    openssl=1.1.1w-0+deb11u1 \
+    nginx=1.18.0-6.1+deb11u3 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Create SSL directory and copy certificates from the certifier stage
+RUN mkdir -p /etc/ssl/nginx
+COPY --from=certifier /etc/ssl/nginx/inception.crt /etc/ssl/nginx
+COPY --from=certifier /etc/ssl/nginx/inception.key /etc/ssl/nginx
+
+# Copy Nginx configuration file (ensure you have this file in your build context)
 COPY ./config/file.conf /etc/nginx/sites-available/default
-# COPY ./src/nginx.conf /etc/nginx/sites-available/default
 
-# openssl	: creating and managing OpenSSL certificates, keys, and other files.
-# req		: request a certificate 
-# x509		: self-signed certificate will be created, certificate signing request (CSR)
-# nodes		: skip securing the certificate with a passphrase, so nginx could read the file
-# newkey	: generate a new certificate and a new key at the same time
-# rsa:2048	: RSA key with 2048 Bit
-# subj		: define the subject of certificate with Common Name (*)
+# Redirect logs to stdout and stderr
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
 
-# EXPOSE 443
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
-
-#SSL : secure sockets layer
-#TLS : transport layer security
-
-#docker run -p 443:443 --name ngin ngin
-
-#docker exec -it ngin bash for frontgroud
-#docker exec -d ngin bash for backgroud
