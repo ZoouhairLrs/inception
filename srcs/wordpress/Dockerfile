@@ -6,9 +6,9 @@ RUN apt update && apt upgrade -y && \
     apt install  php-mysql -y && \
     apt install php-fpm -y
 
-COPY ./conf/script.sh .
+COPY ./conf/setup.sh .
 
-RUN chmod 777 /script.sh
+RUN chmod 777 /setup.sh
 
 EXPOSE 9000
 
