@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  mariadb:
+    build: ./requirements/mariadb/
+    container_name: mariadb
+    image: mariadb
+    env_file:
+      - .env
+    networks:
+      - my_bridge_network
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+
+  nginx:
+    build: ./requirements/nginx/
+    container_name: nginx
+    image: nginx
+    ports:
+      - 443:443
+    env_file:
+      - .env
+    networks:
+      - my_bridge_network
+    volumes:
+      - wdp_data:/var/www/html
+    depends_on:
+      - wordpress
+    restart: always
+
+  wordpress:
+    build: ./requirements/wordpress/
+    container_name: wordpress
+    image: wordpress
+    env_file:
+      - .env
+    networks:
+      - my_bridge_network
+    volumes:
+      - wdp_data:/var/www/html
+    depends_on:
+      - mariadb
+    restart: always
+
+networks:
+  my_bridge_network:
+
+volumes:
+  wdp_data:
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/zlaarous/data/wp
+  db_data:
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/zlaarous/data/db
+    
+    
