@@ -13,8 +13,8 @@ clean: down
 	docker rmi $$(docker images -a -q)
 
 fclean:
-	sudo rm -rf /home/imimouni/data/wp/*
-	sudo rm -rf /home/imimouni/data/db/*
+	sudo rm -rf /home/zlaarous/data/wp/*
+	sudo rm -rf /home/zlaarous/data/db/*
 
 prune:
 	docker system prune --all --volumes --force
