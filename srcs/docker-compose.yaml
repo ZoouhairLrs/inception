@@ -51,11 +51,10 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /home/zlaarous/data/wp
+      device: /Users/zlaarous/data/wp
   db_data:
     driver_opts:
       o: bind
       type: none
-      device: /home/zlaarous/data/db
-    
+      device: /Users/zlaarous/data/db
     

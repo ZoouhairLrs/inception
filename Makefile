@@ -1,31 +1,30 @@
+DB_VOLUME_DIR := $(HOME)/data/db_volume
+WP_VOLUME_DIR := $(HOME)/data/wp_volume
+AD_VOLUME_DIR := $(HOME)/data/ad_volume
+
+.PHONY: all cp down stop fclean re
 
 all:
-	docker compose -f srcs/docker-compose.yaml up
+	@mkdir -p $(DB_VOLUME_DIR) $(WP_VOLUME_DIR) $(AD_VOLUME_DIR)
+	@docker compose -f srcs/docker-compose.yaml up --build
 
-up: 
-	docker compose -f srcs/docker-compose.yaml up -d
+cp:
+	@docker cp webserver:/etc/ssl/nginx/inception.crt ~/ || true
 
-down: 
-	docker compose -f srcs/docker-compose.yaml down
+down:
+	@docker compose -f srcs/docker-compose.yaml down || true
 
-clean: down
-	docker volume rm $$(docker volume ls -q)
-	docker rmi $$(docker images -a -q)
+stop:
+	@docker stop $(shell docker ps -q) 2>/dev/null || true
+	@docker rm $(shell docker ps -a -q) 2>/dev/null || true
 
-fclean:
-	sudo rm -rf /home/zlaarous/data/wp/*
-	sudo rm -rf /home/zlaarous/data/db/*
-
-prune:
-	docker system prune --all --volumes --force
+fclean: down
+	@docker stop $$(docker ps -qa) 2>/dev/null || true
+	@docker rm $$(docker ps -qa) 2>/dev/null || true
+	@docker rmi -f $$(docker images -qa) 2>/dev/null || true
+	@docker volume rm $$(docker volume ls -q) 2>/dev/null || true
+	@docker network rm $$(docker network ls -q) 2>/dev/null || true
+	@docker system prune -af || true
+	@rm -rf $(DB_VOLUME_DIR) $(WP_VOLUME_DIR) || true
 
 re: down all
-
-nginx:
-	docker exec -it nginx bash
-
-mariadb:
-	docker exec -it mariadb bash
-
-wordpress:
-	docker exec -it wordpress bash
