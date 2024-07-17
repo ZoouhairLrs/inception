@@ -8,8 +8,8 @@ RUN apt update && apt upgrade -y && \
 
 COPY ./conf/setup.sh .
 
-RUN chmod 777 /setup.sh
+RUN chmod 777 ./setup.sh
 
 EXPOSE 9000
 
-CMD ["./script.sh"]
+CMD ["./setup.sh"]

@@ -3,8 +3,8 @@ FROM debian:bullseye-slim
 
 RUN apt update && apt upgrade -y && apt install mariadb-server -y 
 
-COPY ./conf/scripting.sh .
-RUN chmod 777 ./scripting.sh
+COPY ./conf/script.sh .
+RUN chmod 777 ./script.sh
 
 EXPOSE 3306
 
