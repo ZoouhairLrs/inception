@@ -30,9 +30,10 @@ RUN mkdir -p /etc/ssl/nginx
 COPY --from=certifier /etc/ssl/nginx/inception.crt /etc/ssl/nginx
 COPY --from=certifier /etc/ssl/nginx/inception.key /etc/ssl/nginx
 
+RUN rm /etc/nginx/nginx.conf
 # Copy Nginx configuration file (ensure you have this file in your build context)
-COPY ./config/file.conf /etc/nginx/sites-available/default
-
+COPY ./config/nginx.conf /etc/nginx/
+RUN chmod -R 777 /var/www/html
 # Redirect logs to stdout and stderr
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log

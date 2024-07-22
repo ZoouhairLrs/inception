@@ -12,4 +12,4 @@ RUN chmod 777 ./setup.sh
 
 EXPOSE 9000
 
-CMD ["./setup.sh"]
+ENTRYPOINT ["/bin/bash", "./setup.sh"]
