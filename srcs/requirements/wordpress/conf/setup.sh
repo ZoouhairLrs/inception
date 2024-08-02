@@ -22,12 +22,15 @@ if [ -f ./wp-config.php ]
     wp config create --dbname=$MARIADB_NAME --dbuser=$MARIADB_USER --dbpass=$MARIADB_PWD --dbhost=$MARIADB_HOST --allow-root
 
     wp core install --url=$DOMAIN_NAME --title="Inception" --admin_user=$WORDPRESS_ADMIN_USR --admin_password=$WORDPRESS_ADMIN_PWD --admin_email=$WORDPRESS_ADMIN_EMAIL --allow-root
-    wp user create $WORDPRESS_USER $WORDPRESS_USER_EMAIL --role=subscriber --user_pass=$WORDPRESS_USER_PASSWORD --allow-root
+    wp user create $WORDPRESS_USR $WORDPRESS_USR_EMAIL --role=subscriber --user_pass=$WORDPRESS_USR_PWD --allow-root
 fi
 
  mkdir -p /var/run/php
- sed -i 's/listen = /run/php/php7.4-fpm.sock/listen = 0.0.0.0:9000/' /etc/php/7.4/fpm/pool.d/www.conf
+#  sed -i '/listen = /run/php/php7.4-fpm.sock|listen = 9000/' /etc/php/7.4/fpm/pool.d/www.conf
+ sed -i 's|^listen = .*|listen = 9000|' /etc/php/7.4/fpm/pool.d/www.conf
+
 #  /etc/init.d/php7.4-fpm restart
-/usr/sbin/php-fpm7 -F -R
+# /usr/bin/php7.4 -F -R
 # exec "$@"
+/usr/sbin/php-fpm7.4 -F
 # tail -f /dev/null
